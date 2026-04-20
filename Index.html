@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>React Mastery – Yuri's Curriculum</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a26;
+    --border: #2a2a3a;
+    --accent: #00e5ff;
+    --accent2: #ff6b6b;
+    --accent3: #a78bfa;
+    --text: #e8e8f0;
+    --muted: #666680;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --radius: 12px;
+    --font-mono: 'Space Mono', monospace;
+    --font-ui: 'Syne', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-ui); overflow-x: hidden; }
+
+/* SCREENS */
+.screen { display: none; min-height: 100vh; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ── HOME ── */
+#home {
+background: var(–bg);
+padding: 0;
+position: relative;
+overflow: hidden;
+}
+.home-grid-bg {
+position: absolute; inset: 0;
+background-image:
+linear-gradient(rgba(0,229,255,.04) 1px, transparent 1px),
+linear-gradient(90deg, rgba(0,229,255,.04) 1px, transparent 1px);
+background-size: 40px 40px;
+pointer-events: none;
+}
+.home-content { position: relative; z-index: 1; padding: 60px 24px 40px; display: flex; flex-direction: column; gap: 32px; }
+.home-tag {
+display: inline-flex; align-items: center; gap: 8px;
+background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.2);
+color: var(–accent); font-family: var(–font-mono); font-size: 11px;
+padding: 6px 12px; border-radius: 100px; width: fit-content;
+letter-spacing: .08em;
+}
+.home-tag::before { content: ‘’; width: 6px; height: 6px; border-radius: 50%; background: var(–accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+.home-title { font-size: clamp(36px, 10vw, 52px); font-weight: 800; line-height: 1.05; letter-spacing: -.02em; }
+.home-title span { color: var(–accent); }
+.home-sub { font-family: var(–font-mono); font-size: 13px; color: var(–muted); line-height: 1.7; }
+.home-sub strong { color: var(–text); }
+
+.progress-ring-wrap { display: flex; align-items: center; gap: 20px; background: var(–surface); border: 1px solid var(–border); border-radius: var(–radius); padding: 20px; }
+.ring-label { flex: 1; }
+.ring-label h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.ring-label p { font-family: var(–font-mono); font-size: 11px; color: var(–muted); }
+svg.ring { width: 64px; height: 64px; flex-shrink: 0; }
+
+.modules-list { display: flex; flex-direction: column; gap: 10px; }
+.module-card {
+background: var(–surface); border: 1px solid var(–border);
+border-radius: var(–radius); padding: 16px 18px;
+display: flex; align-items: center; gap: 14px;
+cursor: pointer; transition: all .2s; position: relative; overflow: hidden;
+}
+.module-card::after {
+content: ‘’; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+background: var(–accent); transform: scaleY(0); transition: transform .2s; transform-origin: bottom;
+}
+.module-card:active { transform: scale(.98); }
+.module-card.unlocked:hover::after, .module-card.unlocked:focus::after { transform: scaleY(1); }
+.module-card.locked { opacity: .4; cursor: not-allowed; }
+.module-card.completed { border-color: rgba(34,197,94,.3); }
+.module-card.completed::after { background: var(–success); transform: scaleY(1); }
+.module-card.in-progress::after { background: var(–accent); transform: scaleY(1); }
+.mod-icon {
+width: 44px; height: 44px; border-radius: 10px; background: var(–surface2);
+display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+}
+.mod-info { flex: 1; min-width: 0; }
+.mod-title { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.mod-meta { font-family: var(–font-mono); font-size: 10px; color: var(–muted); display: flex; gap: 10px; }
+.mod-status { font-size: 18px; flex-shrink: 0; }
+
+/* ── MODULE VIEW ── */
+#module-view { background: var(–bg); }
+.module-header {
+padding: 20px 20px 0;
+display: flex; align-items: center; gap: 12px;
+border-bottom: 1px solid var(–border);
+padding-bottom: 16px;
+}
+.back-btn {
+width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(–border);
+background: var(–surface); color: var(–text); font-size: 18px;
+display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+}
+.module-header-info { flex: 1; }
+.module-header-info h2 { font-size: 16px; font-weight: 700; }
+.module-header-info p { font-family: var(–font-mono); font-size: 10px; color: var(–muted); margin-top: 2px; }
+.lesson-progress-bar { height: 2px; background: var(–border); position: relative; }
+.lesson-progress-fill { height: 100%; background: var(–accent); transition: width .4s ease; }
+
+.lessons-list { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.lesson-item {
+background: var(–surface); border: 1px solid var(–border); border-radius: 10px;
+padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+transition: all .2s;
+}
+.lesson-item:active { transform: scale(.98); }
+.lesson-item.locked { opacity: .35; cursor: not-allowed; }
+.lesson-item.done { border-color: rgba(34,197,94,.25); }
+.lesson-dot {
+width: 32px; height: 32px; border-radius: 50%; background: var(–surface2);
+display: flex; align-items: center; justify-content: center;
+font-family: var(–font-mono); font-size: 11px; color: var(–muted); flex-shrink: 0;
+}
+.lesson-dot.done { background: rgba(34,197,94,.15); color: var(–success); }
+.lesson-dot.active { background: rgba(0,229,255,.12); color: var(–accent); }
+.lesson-info h3 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.lesson-info p { font-family: var(–font-mono); font-size: 10px; color: var(–muted); }
+.lesson-type-badge {
+margin-left: auto; font-family: var(–font-mono); font-size: 9px; padding: 3px 7px;
+border-radius: 100px; border: 1px solid var(–border); color: var(–muted); flex-shrink: 0;
+}
+.lesson-type-badge.quiz { border-color: rgba(167,139,250,.3); color: var(–accent3); }
+.lesson-type-badge.code { border-color: rgba(0,229,255,.3); color: var(–accent); }
+.lesson-type-badge.project { border-color: rgba(255,107,107,.3); color: var(–accent2); }
+.lesson-type-badge.flash { border-color: rgba(245,158,11,.3); color: var(–warning); }
+
+/* ── LESSON VIEW ── */
+#lesson-view { background: var(–bg); }
+.lesson-header {
+padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+border-bottom: 1px solid var(–border); position: sticky; top: 0; z-index: 10; background: var(–bg);
+}
+.lesson-content { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+
+/* CONTENT BLOCKS */
+.content-block { animation: fadeUp .3s ease both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.block-text { font-size: 14px; line-height: 1.8; color: var(–text); }
+.block-text strong { color: var(–accent); font-weight: 700; }
+.block-text em { color: var(–accent3); font-style: normal; font-weight: 600; }
+
+.block-code {
+background: var(–surface); border: 1px solid var(–border); border-radius: var(–radius);
+overflow: hidden;
+}
+.code-header {
+padding: 10px 14px; background: var(–surface2); border-bottom: 1px solid var(–border);
+font-family: var(–font-mono); font-size: 10px; color: var(–muted);
+display: flex; align-items: center; justify-content: space-between;
+}
+.code-dots { display: flex; gap: 5px; }
+.code-dot { width: 8px; height: 8px; border-radius: 50%; }
+pre {
+padding: 16px; font-family: var(–font-mono); font-size: 12px; line-height: 1.7;
+overflow-x: auto; color: var(–text);
+}
+.kw { color: #ff79c6; }
+.fn { color: #50fa7b; }
+.str { color: #f1fa8c; }
+.cmt { color: #6272a4; }
+.tag { color: #ff79c6; }
+.attr { color: #50fa7b; }
+.var { color: #8be9fd; }
+.num { color: #bd93f9; }
+
+.block-diagram {
+background: var(–surface); border: 1px solid var(–border); border-radius: var(–radius);
+padding: 20px; text-align: center;
+}
+.diagram-title { font-family: var(–font-mono); font-size: 10px; color: var(–muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: .1em; }
+
+/* DIAGRAM: React Render Cycle */
+.flow-diagram { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.flow-node {
+background: var(–surface2); border: 1px solid var(–border); border-radius: 8px;
+padding: 10px 18px; font-size: 12px; font-weight: 600;
+display: flex; align-items: center; gap: 8px; min-width: 160px; justify-content: center;
+}
+.flow-node.accent { border-color: rgba(0,229,255,.4); color: var(–accent); background: rgba(0,229,255,.06); }
+.flow-node.purple { border-color: rgba(167,139,250,.4); color: var(–accent3); background: rgba(167,139,250,.06); }
+.flow-node.red { border-color: rgba(255,107,107,.4); color: var(–accent2); background: rgba(255,107,107,.06); }
+.flow-node.green { border-color: rgba(34,197,94,.4); color: var(–success); background: rgba(34,197,94,.06); }
+.flow-arrow { font-size: 18px; color: var(–muted); margin: 4px 0; }
+.flow-label { font-family: var(–font-mono); font-size: 9px; color: var(–muted); margin-top: -2px; margin-bottom: 2px; }
+
+/* QUIZ */
+.block-quiz { display: flex; flex-direction: column; gap: 12px; }
+.quiz-question {
+background: var(–surface); border: 1px solid var(–border); border-radius: var(–radius); padding: 16px;
+}
+.quiz-q-text { font-size: 14px; line-height: 1.6; margin-bottom: 14px; font-weight: 600; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-option {
+padding: 12px 14px; border-radius: 8px; border: 1px solid var(–border);
+background: var(–surface2); font-size: 13px; cursor: pointer; transition: all .15s;
+font-family: var(–font-mono); text-align: left; color: var(–text);
+display: flex; align-items: flex-start; gap: 10px;
+}
+.quiz-option:active { transform: scale(.98); }
+.quiz-option.selected { border-color: var(–accent); background: rgba(0,229,255,.08); }
+.quiz-option.correct { border-color: var(–success); background: rgba(34,197,94,.1); color: var(–success); }
+.quiz-option.wrong { border-color: var(–accent2); background: rgba(255,107,107,.1); color: var(–accent2); }
+.quiz-option-key {
+width: 20px; height: 20px; border-radius: 4px; background: var(–border);
+display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; margin-top: 1px;
+}
+.quiz-feedback {
+padding: 12px 14px; border-radius: 8px; font-size: 12px; line-height: 1.6;
+font-family: var(–font-mono); display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: rgba(34,197,94,.08); border: 1px solid rgba(34,197,94,.2); color: var(–success); }
+.quiz-feedback.wrong { background: rgba(255,107,107,.08); border: 1px solid rgba(255,107,107,.2); color: var(–accent2); }
+
+/* FLASHCARD */
+.flashcard-wrap { perspective: 1000px; }
+.flashcard {
+width: 100%; min-height: 180px; position: relative;
+transform-style: preserve-3d; transition: transform .5s ease;
+cursor: pointer;
+}
+.flashcard.flipped { transform: rotateY(180deg); }
+.flashcard-face {
+position: absolute; inset: 0; border-radius: var(–radius);
+padding: 24px 20px; display: flex; flex-direction: column;
+align-items: center; justify-content: center; text-align: center;
+backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+.flashcard-front {
+background: var(–surface); border: 1px solid var(–border);
+}
+.flashcard-back {
+background: rgba(0,229,255,.05); border: 1px solid rgba(0,229,255,.25);
+transform: rotateY(180deg);
+}
+.flashcard-hint { font-family: var(–font-mono); font-size: 10px; color: var(–muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: .1em; }
+.flashcard-text { font-size: 15px; font-weight: 700; line-height: 1.5; }
+.flashcard-answer { font-size: 13px; line-height: 1.7; color: var(–text); font-family: var(–font-mono); }
+.flashcard-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 12px; }
+.fc-btn {
+width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(–border);
+background: var(–surface); color: var(–text); font-size: 16px; cursor: pointer;
+display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.fc-btn:active { transform: scale(.92); }
+.fc-count { font-family: var(–font-mono); font-size: 11px; color: var(–muted); }
+
+/* CODE CHALLENGE */
+.block-challenge { display: flex; flex-direction: column; gap: 12px; }
+.challenge-prompt {
+background: var(–surface); border: 1px solid var(–border); border-radius: var(–radius); padding: 16px;
+}
+.challenge-label {
+font-family: var(–font-mono); font-size: 10px; color: var(–accent); text-transform: uppercase;
+letter-spacing: .1em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+}
+.challenge-label::before { content: ‘’; width: 6px; height: 6px; border-radius: 50%; background: var(–accent); }
+.challenge-text { font-size: 13px; line-height: 1.7; }
+.challenge-textarea {
+width: 100%; min-height: 120px; background: var(–surface); border: 1px solid var(–border);
+border-radius: var(–radius); padding: 14px; font-family: var(–font-mono); font-size: 12px;
+color: var(–text); resize: vertical; outline: none; transition: border-color .15s;
+}
+.challenge-textarea:focus { border-color: var(–accent); }
+.challenge-reveal-btn {
+padding: 12px; border-radius: 8px; background: transparent; border: 1px solid var(–accent3);
+color: var(–accent3); font-family: var(–font-mono); font-size: 12px; cursor: pointer;
+transition: all .15s;
+}
+.challenge-reveal-btn:active { background: rgba(167,139,250,.1); }
+.challenge-solution { display: none; }
+.challenge-solution.show { display: block; }
+
+/* BOTTOM NAV LESSON */
+.lesson-footer {
+padding: 16px 20px; border-top: 1px solid var(–border);
+display: flex; gap: 10px; background: var(–bg);
+position: sticky; bottom: 0;
+}
+.btn-secondary {
+flex: 1; padding: 14px; border-radius: 10px; border: 1px solid var(–border);
+background: var(–surface); color: var(–text); font-family: var(–font-ui); font-size: 14px;
+font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.btn-primary {
+flex: 2; padding: 14px; border-radius: 10px; border: none;
+background: var(–accent); color: #000; font-family: var(–font-ui); font-size: 14px;
+font-weight: 700; cursor: pointer; transition: all .15s;
+}
+.btn-primary:active { transform: scale(.97); }
+.btn-secondary:active { transform: scale(.97); }
+
+/* CELEBRATION */
+.confetti-wrap {
+position: fixed; inset: 0; pointer-events: none; z-index: 999;
+display: flex; align-items: center; justify-content: center;
+}
+.complete-toast {
+background: var(–success); color: #000; padding: 16px 24px; border-radius: 100px;
+font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;
+animation: toastIn .4s ease both, toastOut .4s ease 2.5s both;
+pointer-events: none;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(-10px) scale(.9); } }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(–border); border-radius: 2px; }
+
+.section-label {
+font-family: var(–font-mono); font-size: 10px; color: var(–muted);
+text-transform: uppercase; letter-spacing: .12em; padding: 0 16px; margin-top: 8px;
+}
+
+.xp-badge {
+display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px;
+border-radius: 100px; background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.2);
+font-family: var(–font-mono); font-size: 10px; color: var(–warning);
+}
+</style>
+
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HOME ═══════════════════════════════════ -->
+
+<div id="home" class="screen active">
+  <div class="home-grid-bg"></div>
+  <div class="home-content">
+    <div class="home-tag">⚡ React Mastery Curriculum</div>
+    <div>
+      <h1 class="home-title">Ship<br/><span>production</span><br/>React.</h1>
+    </div>
+    <p class="home-sub">7 modules. <strong>Real interview questions.</strong> Built for engineers, not beginners.</p>
+
+```
+<div class="progress-ring-wrap">
+  <div class="ring-label">
+    <h3>Your Progress</h3>
+    <p id="home-progress-text">0 of 7 modules complete</p>
+  </div>
+  <svg class="ring" viewBox="0 0 64 64">
+    <circle cx="32" cy="32" r="26" fill="none" stroke="#2a2a3a" stroke-width="5"/>
+    <circle id="ring-circle" cx="32" cy="32" r="26" fill="none" stroke="#00e5ff" stroke-width="5"
+      stroke-dasharray="163.4" stroke-dashoffset="163.4" stroke-linecap="round"
+      transform="rotate(-90 32 32)" style="transition:stroke-dashoffset .6s ease"/>
+    <text x="32" y="37" text-anchor="middle" fill="#00e5ff" font-family="'Space Mono',monospace" font-size="11" font-weight="700" id="ring-pct">0%</text>
+  </svg>
+</div>
+
+<div>
+  <div class="section-label" style="padding:0;margin-bottom:10px;">Modules</div>
+  <div class="modules-list" id="modules-list"></div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ MODULE VIEW ═══════════════════════════════════ -->
+
+<div id="module-view" class="screen">
+  <div class="module-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="module-header-info">
+      <h2 id="mv-title"></h2>
+      <p id="mv-sub"></p>
+    </div>
+  </div>
+  <div class="lesson-progress-bar"><div class="lesson-progress-fill" id="mv-progress-bar" style="width:0%"></div></div>
+  <div style="flex:1;overflow-y:auto">
+    <div class="section-label" style="margin:16px 0 8px 16px">Lessons</div>
+    <div class="lessons-list" id="lessons-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ LESSON VIEW ═══════════════════════════════════ -->
+
+<div id="lesson-view" class="screen">
+  <div class="lesson-header">
+    <button class="back-btn" id="lesson-back-btn">←</button>
+    <div class="module-header-info">
+      <h2 id="lv-title"></h2>
+      <p id="lv-meta"></p>
+    </div>
+    <div class="xp-badge" id="lv-xp">+50 XP</div>
+  </div>
+  <div style="flex:1;overflow-y:auto">
+    <div class="lesson-content" id="lesson-content"></div>
+  </div>
+  <div class="lesson-footer">
+    <button class="btn-secondary" id="lesson-prev-btn" onclick="lessonNav(-1)">← Prev</button>
+    <button class="btn-primary" id="lesson-next-btn" onclick="lessonNav(1)">Next →</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+
+<div class="confetti-wrap" id="toast-wrap" style="display:none">
+  <div class="complete-toast">✓ Lesson Complete! +50 XP</div>
+</div>
+
+<script>
+// ═══════════════════════════ DATA ═══════════════════════════
+
+const CURRICULUM = [
+  {
+    id: 0, icon: '🔁', title: 'Module 0: Foundations Refresh',
+    sub: 'JSX · Components · Props · State · Events',
+    lessons: [
+      {
+        id: 'l0_0', title: 'JSX is Not HTML', type: 'concept', xp: 50,
+        meta: '5 min · Concept + Diagram',
+        blocks: [
+          { type: 'text', content: 'You already know JSX — but do you know <strong>why it compiles the way it does?</strong> This matters in interviews when they ask about React under the hood.' },
+          { type: 'diagram', variant: 'jsx-compile' },
+          { type: 'text', content: 'JSX is syntactic sugar. <em>React.createElement()</em> is what actually runs. Every tag you write gets transformed by Babel before the browser ever sees it.' },
+          { type: 'code', label: 'JSX → what Babel actually compiles it to', code: `<span class="cmt">// What you write:</span>
+<span class="kw">const</span> <span class="var">el</span> = <span class="tag">&lt;h1</span> <span class="attr">className</span>=<span class="str">"title"</span><span class="tag">&gt;</span>Hello<span class="tag">&lt;/h1&gt;</span>
+
+<span class="cmt">// What Babel compiles it to:</span>
+<span class="kw">const</span> <span class="var">el</span> = <span class="fn">React</span>.<span class="fn">createElement</span>(
+  <span class="str">'h1'</span>,
+  { <span class="attr">className</span>: <span class="str">'title'</span> },
+  <span class="str">'Hello'</span>
+)` },
+          { type: 'quiz', question: 'An interviewer asks: "Why can\'t you use `class` in JSX?" What\'s the correct answer?', options: ['React doesn\'t support CSS classes', '`class` is a reserved keyword in JS — JSX uses `className` instead', 'You need to import CSS modules first', 'JSX uses `classList` like the DOM API'], correct: 1, feedback: 'Correct. JSX is JavaScript — and `class` is already a reserved keyword for ES6 classes. Babel compiles className → class in the actual DOM output.' }
+        ]
+      },
+      {
+        id: 'l0_1', title: 'Props vs State', type: 'flash', xp: 50,
+        meta: '5 min · Flashcards',
+        blocks: [
+          { type: 'text', content: 'Props and state are the two core data mechanisms in React. Mixing them up in interviews is a red flag. Lock these in.' },
+          { type: 'flashcards', cards: [
+            { q: 'What is a prop in React?', a: 'Data passed into a component from its parent. Read-only inside the component — you cannot mutate props directly.' },
+            { q: 'What is state in React?', a: 'Data that lives inside a component and can change over time. When state changes, React re-renders the component.' },
+            { q: 'Can a component change its own props?', a: 'No. Props are immutable from the component\'s perspective. Only the parent can change the props it passes down.' },
+            { q: 'What happens when state changes?', a: 'React schedules a re-render of that component and its children. This is what makes the UI reactive.' },
+            { q: 'When would you lift state up?', a: 'When two sibling components need to share the same data. Move the state to their closest common ancestor.' },
+          ]},
+        ]
+      },
+      {
+        id: 'l0_2', title: 'Event Handling + Re-renders', type: 'code', xp: 75,
+        meta: '8 min · Code Challenge',
+        blocks: [
+          { type: 'text', content: 'This is a classic <strong>spot-the-bug</strong> challenge. These exact patterns show up in technical screens.' },
+          { type: 'code', label: 'Find the bug — what\'s wrong here?', code: `<span class="kw">function</span> <span class="fn">Counter</span>() {
+  <span class="kw">let</span> <span class="var">count</span> = <span class="num">0</span>;
+
+  <span class="kw">return</span> (
+    <span class="tag">&lt;div&gt;</span>
+      <span class="tag">&lt;p&gt;</span>{count}<span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;button</span> <span class="attr">onClick</span>={() => count++}<span class="tag">&gt;</span>
+        Add
+      <span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  );
+}` },
+          { type: 'challenge', prompt: 'What\'s the bug? What happens when you click "Add"? Explain what should be done instead.', readOnly: false, solution: `The bug: \`count\` is a plain JS variable — mutating it with count++ does NOT trigger a re-render. React has no idea the value changed.
+
+Fix: use useState() so React can track the value and re-render when it changes.
+
+const [count, setCount] = useState(0);
+// Then: onClick={() => setCount(count + 1)}
+
+useState returns a tuple — the current value and a setter. Calling the setter tells React to schedule a re-render with the new value.` },
+          { type: 'code', label: 'The correct pattern', code: `<span class="kw">import</span> { <span class="fn">useState</span> } <span class="kw">from</span> <span class="str">'react'</span>;
+
+<span class="kw">function</span> <span class="fn">Counter</span>() {
+  <span class="kw">const</span> [<span class="var">count</span>, <span class="var">setCount</span>] = <span class="fn">useState</span>(<span class="num">0</span>);
+
+  <span class="kw">return</span> (
+    <span class="tag">&lt;div&gt;</span>
+      <span class="tag">&lt;p&gt;</span>{count}<span class="tag">&lt;/p&gt;</span>
+      <span class="tag">&lt;button</span> <span class="attr">onClick</span>={() => <span class="fn">setCount</span>(count + <span class="num">1</span>)}<span class="tag">&gt;</span>
+        Add
+      <span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+  );
+}` }
+        ]
+      },
+      {
+        id: 'l0_3', title: 'Lists, Keys & Conditional Rendering', type: 'quiz', xp: 75,
+        meta: '8 min · Quiz',
+        blocks: [
+          { type: 'text', content: 'Rendering lists and conditionals are everywhere in real apps. The <strong>key prop</strong> is one of the most commonly misunderstood concepts — and interviewers love testing it.' },
+          { type: 'code', label: 'Common list rendering pattern', code: `<span class="kw">const</span> <span class="var">users</span> = [
+  { <span class="attr">id</span>: <span class="num">1</span>, <span class="attr">name</span>: <span class="str">'Ana'</span> },
+  { <span class="attr">id</span>: <span class="num">2</span>, <span class="attr">name</span>: <span class="str">'Luis'</span> },
+];
+
+<span class="kw">function</span> <span class="fn">UserList</span>() {
+  <span class="kw">return</span> (
+    <span class="tag">&lt;ul&gt;</span>
+      {users.<span class="fn">map</span>(<span class="var">user</span> => (
+        <span class="tag">&lt;li</span> <span class="attr">key</span>={user.<span class="attr">id</span>}<span class="tag">&gt;</span>
+          {user.<span class="attr">name</span>}
+        <span class="tag">&lt;/li&gt;</span>
+      ))}
+    <span class="tag">&lt;/ul&gt;</span>
+  );
+}` },
+          { type: 'quiz', question: 'Why does React require the `key` prop when rendering lists?', options: ['It\'s for CSS styling purposes', 'It helps React identify which items changed, were added, or removed during reconciliation', 'It\'s required for the map() function to work', 'It prevents duplicate components from rendering'], correct: 1, feedback: 'React\'s reconciliation algorithm uses keys to efficiently diff the virtual DOM. Without stable keys, React can\'t tell which element is which — causing incorrect re-renders or state bugs.' },
+          { type: 'quiz', question: 'You have a list with no unique IDs. A teammate uses the array index as the key. What\'s the risk?', options: ['The app will crash immediately', 'No risk — index works the same as an ID', 'If items are reordered or deleted, keys no longer match the correct elements — causing state/UI bugs', 'Performance will be slightly slower'], correct: 2, feedback: 'Using index as key is fine for static, never-reordered lists. But if items are added/removed/sorted, the index shifts — and React will incorrectly associate component state with the wrong element.' },
+        ]
+      },
+    ]
+  },
+  {
+    id: 1, icon: '🧠', title: 'Module 1: React Mental Models',
+    sub: 'Reconciliation · Virtual DOM · Rendering lifecycle',
+    lessons: [
+      {
+        id: 'l1_0', title: 'The React Render Cycle', type: 'concept', xp: 75,
+        meta: '8 min · Diagram + Concept',
+        blocks: [
+          { type: 'text', content: 'Understanding <strong>when and why React renders</strong> separates mid-level from senior engineers. This is the mental model that makes everything else click.' },
+          { type: 'diagram', variant: 'render-cycle' },
+          { type: 'text', content: 'React rendering has two phases: <em>Render phase</em> (pure, no side effects — React calls your component function and gets JSX back), and <em>Commit phase</em> (React updates the actual DOM). This split is why hooks like useEffect run after paint.' },
+          { type: 'quiz', question: 'A senior dev says "React rendering is expensive." What does this actually mean?', options: ['React updates the real DOM on every render', 'React re-runs your component function, diffs the virtual DOM, then commits only real changes', 'React sends data to a server on every render', 'React deletes and recreates DOM nodes each time'], correct: 1, feedback: 'React rendering = calling your component function + reconciliation (diffing vDOM). The commit phase (touching the real DOM) is actually minimal — React only updates what changed. But your component function runs entirely each time.' }
+        ]
+      },
+      {
+        id: 'l1_1', title: 'Reconciliation & the Diffing Algorithm', type: 'concept', xp: 100,
+        meta: '10 min · Concept + Quiz',
+        blocks: [
+          { type: 'text', content: 'Reconciliation is React\'s process of comparing the previous virtual DOM tree to the new one and computing the minimal set of real DOM changes. Interviewers ask this to test <strong>depth of understanding</strong>.' },
+          { type: 'flashcards', cards: [
+            { q: 'What is the Virtual DOM?', a: 'A lightweight JavaScript object tree that mirrors the real DOM. React diffs two vDOM snapshots to determine what actually changed.' },
+            { q: 'What are React\'s two heuristics in the diffing algorithm?', a: '1) Elements of different types produce different trees (tear down and rebuild). 2) The `key` prop tells React which elements are stable across renders.' },
+            { q: 'What triggers a re-render in React?', a: 'State change via useState/useReducer, context value change, parent re-render (unless memoized), or forceUpdate (class components).' },
+            { q: 'Does re-render always mean DOM update?', a: 'No. Re-render means React calls your component function again. It only commits to the real DOM if the output actually differs from the previous render.' },
+          ]},
+          { type: 'quiz', question: 'React replaces the entire DOM subtree when — ?', options: ['Any state changes', 'The root element type changes (e.g. `<div>` becomes `<section>`)', 'More than 10 elements change at once', 'You call ReactDOM.render() again'], correct: 1, feedback: 'React assumes if the element type changed, the tree structure is fundamentally different. It unmounts the old subtree and mounts a new one from scratch — including resetting all state.' }
+        ]
+      },
+    ]
+  },
+  {
+    id: 2, icon: '🪝', title: 'Module 2: Hooks Mastery',
+    sub: 'useState · useEffect · useRef · useMemo · Custom Hooks',
+    lessons: [
+      {
+        id: 'l2_0', title: 'useState Deep Dive', type: 'code', xp: 75,
+        meta: '10 min · Code Challenges',
+        blocks: [
+          { type: 'text', content: 'You\'ve used useState. But can you explain <strong>stale closures</strong>, <strong>functional updates</strong>, and <strong>batching</strong>? These are mid-senior level questions.' },
+          { type: 'code', label: 'Functional update form — when does this matter?', code: `<span class="cmt">// ⚠️ Risky — uses stale closure value</span>
+<span class="fn">setCount</span>(count + <span class="num">1</span>);
+<span class="fn">setCount</span>(count + <span class="num">1</span>); <span class="cmt">// still +1 total, not +2!</span>
+
+<span class="cmt">// ✓ Safe — always uses latest state</span>
+<span class="fn">setCount</span>(<span class="var">prev</span> => prev + <span class="num">1</span>);
+<span class="fn">setCount</span>(<span class="var">prev</span> => prev + <span class="num">1</span>); <span class="cmt">// correctly +2</span>` },
+          { type: 'challenge', prompt: 'Explain in your own words: what is a "stale closure" in the context of useState? When would it bite you in a real app?', readOnly: false, solution: `A stale closure happens when a function "closes over" a value from a previous render, and that value is now outdated.
+
+Real scenario: Inside a setInterval or async operation, the count variable captured at the time the closure was created never updates — even as state changes. The closure still holds the old value.
+
+Fix: Use the functional update form setCount(prev => prev + 1) — React passes the LATEST state value as the argument, bypassing the stale closure entirely.` },
+          { type: 'quiz', question: 'React 18 introduced automatic batching. What does that mean?', options: ['React now runs renders in parallel threads', 'Multiple state updates in async callbacks, timeouts, and promises are now batched into a single re-render', 'useState is replaced by useReducer under the hood', 'State updates are delayed by 1 tick automatically'], correct: 1, feedback: 'Before React 18, batching only happened inside React event handlers. React 18 batches all state updates by default — including those in setTimeout, Promises, and native event listeners. This reduces unnecessary re-renders.' }
+        ]
+      },
+      {
+        id: 'l2_1', title: 'useEffect — The Tricky One', type: 'code', xp: 100,
+        meta: '12 min · Concept + Challenge',
+        blocks: [
+          { type: 'text', content: '<strong>useEffect is the most misused hook</strong>. Infinite loops, stale deps, missing cleanups — these are senior-level interview topics and real production bugs.' },
+          { type: 'diagram', variant: 'use-effect' },
+          { type: 'code', label: 'Dependency array — 3 patterns you must know', code: `<span class="cmt">// 1. No dep array → runs after EVERY render</span>
+<span class="fn">useEffect</span>(() => { ... });
+
+<span class="cmt">// 2. Empty array → runs once after mount only</span>
+<span class="fn">useEffect</span>(() => { ... }, []);
+
+<span class="cmt">// 3. With deps → runs when deps change</span>
+<span class="fn">useEffect</span>(() => { ... }, [<span class="var">userId</span>, <span class="var">filter</span>]);` },
+          { type: 'challenge', prompt: 'Spot the bug: This code causes an infinite loop. Why? How do you fix it?\n\nuseEffect(() => {\n  setData(data.filter(x => x.active));\n}, [data]);', readOnly: false, solution: `Bug: setData creates a new array → updates state → triggers re-render → useEffect runs again → setData again → infinite loop.
+
+The dependency [data] changes every render because filter() returns a new array reference, even if the contents are the same.
+
+Fix options:
+1. Compute the filtered data during render (no effect needed):
+   const activeData = data.filter(x => x.active);
+
+2. If you must use an effect, don't include the derived value in deps — restructure your data flow.
+
+Rule of thumb: if you're setting state that's derived from another state variable, you probably don't need useEffect at all.` },
+          { type: 'quiz', question: 'What is the "cleanup function" in useEffect for?', options: ['To clear the component\'s render output', 'To cancel subscriptions, timers, or async ops when the component unmounts or before the effect re-runs', 'It\'s only needed for class components', 'To reset state to its initial value'], correct: 1, feedback: 'The cleanup function runs before the next effect execution and on unmount. Critical for: clearing setInterval, cancelling fetch requests, unsubscribing from event listeners or WebSocket connections. Missing cleanups = memory leaks.' }
+        ]
+      },
+      {
+        id: 'l2_2', title: 'useMemo & useCallback', type: 'quiz', xp: 100,
+        meta: '10 min · Quiz + Code',
+        blocks: [
+          { type: 'text', content: 'These two hooks are about <strong>memoization</strong>. Overusing them is a code smell — but knowing exactly when to use them signals seniority.' },
+          { type: 'flashcards', cards: [
+            { q: 'What does useMemo do?', a: 'Memoizes the result of an expensive computation. Returns the cached value unless its dependencies changed. Good for CPU-heavy derivations from props/state.' },
+            { q: 'What does useCallback do?', a: 'Memoizes a function reference. Returns the same function instance between renders unless deps change. Critical when passing callbacks to memoized child components.' },
+            { q: 'What\'s the danger of overusing useMemo/useCallback?', a: 'They add overhead (memory + comparison cost). React.memo, useMemo, useCallback only help when re-render cost > memoization cost. Profile first.' },
+            { q: 'useMemo vs useCallback — one-line difference?', a: 'useMemo returns a memoized VALUE. useCallback returns a memoized FUNCTION.' },
+          ]},
+          { type: 'quiz', question: 'You wrap a child component in React.memo. The parent re-renders. The child still re-renders. Why?', options: ['React.memo doesn\'t work with functional components', 'The callback prop passed to the child is recreated on every parent render — it\'s a new function reference', 'You forgot to import memo from react', 'React.memo only works in production mode'], correct: 1, feedback: 'React.memo compares props shallowly. If a parent passes a callback like `onClick={() => handleClick()}`, that arrow function is new on every render. Wrap it in useCallback so the reference stays stable — then React.memo can actually bail out.' }
+        ]
+      },
+      {
+        id: 'l2_3', title: 'Custom Hooks — Build One', type: 'project', xp: 150,
+        meta: '15 min · Mini Project',
+        blocks: [
+          { type: 'text', content: 'Custom hooks are how senior engineers share stateful logic without duplicating code. They\'re just functions that use other hooks. But the <strong>design decisions</strong> are what interviewers probe.' },
+          { type: 'code', label: 'Classic custom hook — useFetch', code: `<span class="kw">function</span> <span class="fn">useFetch</span>(<span class="var">url</span>) {
+  <span class="kw">const</span> [<span class="var">data</span>, <span class="var">setData</span>] = <span class="fn">useState</span>(<span class="kw">null</span>);
+  <span class="kw">const</span> [<span class="var">loading</span>, <span class="var">setLoading</span>] = <span class="fn">useState</span>(<span class="kw">true</span>);
+  <span class="kw">const</span> [<span class="var">error</span>, <span class="var">setError</span>] = <span class="fn">useState</span>(<span class="kw">null</span>);
+
+  <span class="fn">useEffect</span>(() => {
+    <span class="kw">const</span> <span class="var">controller</span> = <span class="kw">new</span> <span class="fn">AbortController</span>();
+
+    <span class="fn">fetch</span>(url, { <span class="attr">signal</span>: controller.<span class="attr">signal</span> })
+      .<span class="fn">then</span>(<span class="var">r</span> => r.<span class="fn">json</span>())
+      .<span class="fn">then</span>(<span class="var">d</span> => <span class="fn">setData</span>(d))
+      .<span class="fn">catch</span>(<span class="var">e</span> => {
+        <span class="kw">if</span> (e.<span class="attr">name</span> !== <span class="str">'AbortError'</span>) <span class="fn">setError</span>(e);
+      })
+      .<span class="fn">finally</span>(() => <span class="fn">setLoading</span>(<span class="kw">false</span>));
+
+    <span class="kw">return</span> () => controller.<span class="fn">abort</span>();
+  }, [url]);
+
+  <span class="kw">return</span> { data, loading, error };
+}` },
+          { type: 'challenge', prompt: 'Design a custom hook called `useLocalStorage(key, initialValue)` that:\n1. Reads from localStorage on mount\n2. Stays in sync with state\n3. Writes back to localStorage when state changes\n\nWrite the implementation or describe each piece and why.', readOnly: false, solution: `function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() => {
+    // Lazy init — reads from localStorage once on mount
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  });
+
+  const setStoredValue = (newValue) => {
+    setValue(newValue);
+    localStorage.setItem(key, JSON.stringify(newValue));
+  };
+
+  return [value, setStoredValue];
+}
+
+Key decisions:
+- Lazy useState init (function form) so localStorage is only read once
+- Wrap in try/catch — localStorage can be disabled (private mode)
+- Return same [value, setter] tuple as useState for a familiar API` }
+        ]
+      }
+    ]
+  },
+  {
+    id: 3, icon: '🗺️', title: 'Module 3: React Router',
+    sub: 'Client-side routing · Protected routes · Lazy loading',
+    lessons: [
+      {
+        id: 'l3_0', title: 'Client-Side Routing Mental Model', type: 'concept', xp: 75,
+        meta: '8 min · Concept + Diagram',
+        blocks: [
+          { type: 'text', content: 'React Router intercepts URL changes and renders different components — <strong>no page reloads</strong>. Understanding this model is essential for interviews about SPAs.' },
+          { type: 'diagram', variant: 'router' },
+          { type: 'code', label: 'React Router v6 — basic setup', code: `<span class="kw">import</span> { <span class="fn">BrowserRouter</span>, <span class="fn">Routes</span>, <span class="fn">Route</span> } <span class="kw">from</span> <span class="str">'react-router-dom'</span>;
+
+<span class="kw">function</span> <span class="fn">App</span>() {
+  <span class="kw">return</span> (
+    <span class="tag">&lt;BrowserRouter&gt;</span>
+      <span class="tag">&lt;Routes&gt;</span>
+        <span class="tag">&lt;Route</span> <span class="attr">path</span>=<span class="str">"/"</span> <span class="attr">element</span>={<span class="tag">&lt;Home /&gt;</span>} <span class="tag">/&gt;</span>
+        <span class="tag">&lt;Route</span> <span class="attr">path</span>=<span class="str">"/users/:id"</span> <span class="attr">element</span>={<span class="tag">&lt;UserProfile /&gt;</span>} <span class="tag">/&gt;</span>
+        <span class="tag">&lt;Route</span> <span class="attr">path</span>=<span class="str">"*"</span> <span class="attr">element</span>={<span class="tag">&lt;NotFound /&gt;</span>} <span class="tag">/&gt;</span>
+      <span class="tag">&lt;/Routes&gt;</span>
+    <span class="tag">&lt;/BrowserRouter&gt;</span>
+  );
+}` },
+          { type: 'quiz', question: 'What\'s the difference between BrowserRouter and HashRouter?', options: ['BrowserRouter is for React Native, HashRouter for web', 'BrowserRouter uses the HTML5 History API (clean URLs). HashRouter uses the URL hash (#) — works without server config but looks like /home#/dashboard', 'They\'re identical — just different names', 'BrowserRouter is deprecated in v6'], correct: 1, feedback: 'BrowserRouter requires the server to serve index.html for all routes (catch-all config). HashRouter works anywhere since the # part never hits the server. Most SPAs use BrowserRouter in production with proper server config.' }
+        ]
+      },
+      {
+        id: 'l3_1', title: 'Protected Routes & Lazy Loading', type: 'code', xp: 100,
+        meta: '10 min · Code + Challenge',
+        blocks: [
+          { type: 'text', content: 'Protected routes and code splitting are must-know patterns for production apps. These come up constantly in both interviews and take-home projects.' },
+          { type: 'code', label: 'Protected Route pattern', code: `<span class="kw">function</span> <span class="fn">ProtectedRoute</span>({ <span class="var">children</span> }) {
+  <span class="kw">const</span> { <span class="var">isAuthenticated</span> } = <span class="fn">useAuth</span>();
+
+  <span class="kw">if</span> (!isAuthenticated) {
+    <span class="kw">return</span> <span class="tag">&lt;Navigate</span> <span class="attr">to</span>=<span class="str">"/login"</span> <span class="attr">replace</span> <span class="tag">/&gt;</span>;
+  }
+
+  <span class="kw">return</span> children;
+}
+
+<span class="cmt">// Usage:</span>
+<span class="tag">&lt;Route</span> <span class="attr">path</span>=<span class="str">"/dashboard"</span> <span class="attr">element</span>={
+  <span class="tag">&lt;ProtectedRoute&gt;</span>
+    <span class="tag">&lt;Dashboard /&gt;</span>
+  <span class="tag">&lt;/ProtectedRoute&gt;</span>
+} <span class="tag">/&gt;</span>` },
+          { type: 'code', label: 'Lazy loading routes — code splitting', code: `<span class="kw">import</span> { <span class="fn">lazy</span>, <span class="fn">Suspense</span> } <span class="kw">from</span> <span class="str">'react'</span>;
+
+<span class="kw">const</span> <span class="var">Dashboard</span> = <span class="fn">lazy</span>(() => <span class="kw">import</span>(<span class="str">'./Dashboard'</span>));
+
+<span class="kw">function</span> <span class="fn">App</span>() {
+  <span class="kw">return</span> (
+    <span class="tag">&lt;Suspense</span> <span class="attr">fallback</span>={<span class="tag">&lt;Spinner /&gt;</span>}<span class="tag">&gt;</span>
+      <span class="tag">&lt;Routes&gt;</span>
+        <span class="tag">&lt;Route</span> <span class="attr">path</span>=<span class="str">"/dashboard"</span> <span class="attr">element</span>={<span class="tag">&lt;Dashboard /&gt;</span>} <span class="tag">/&gt;</span>
+      <span class="tag">&lt;/Routes&gt;</span>
+    <span class="tag">&lt;/Suspense&gt;</span>
+  );
+}` },
+          { type: 'quiz', question: 'Why use lazy() + Suspense for routes?', options: ['It\'s required by React Router v6', 'It splits the JS bundle — the Dashboard code only downloads when the user navigates there, improving initial load time', 'It prevents re-renders on navigation', 'Lazy loading enables server-side rendering'], correct: 1, feedback: 'Code splitting via dynamic import() creates separate JS chunks. Suspense shows a fallback while the chunk loads. On large apps this can dramatically reduce the initial bundle — critical for performance scores.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 4, icon: '🗄️', title: 'Module 4: State Management',
+    sub: 'Context API → Zustand → Redux Toolkit',
+    lessons: [
+      {
+        id: 'l4_0', title: 'Context API — Strengths & Limits', type: 'concept', xp: 75,
+        meta: '8 min · Concept + Quiz',
+        blocks: [
+          { type: 'text', content: 'Context solves prop drilling — but it\'s <strong>not a state management solution</strong>. Misusing it causes subtle performance bugs. Senior engineers know the difference.' },
+          { type: 'code', label: 'Context API pattern', code: `<span class="kw">const</span> <span class="var">AuthContext</span> = <span class="fn">createContext</span>(<span class="kw">null</span>);
+
+<span class="kw">function</span> <span class="fn">AuthProvider</span>({ <span class="var">children</span> }) {
+  <span class="kw">const</span> [<span class="var">user</span>, <span class="var">setUser</span>] = <span class="fn">useState</span>(<span class="kw">null</span>);
+
+  <span class="kw">const</span> <span class="var">value</span> = <span class="fn">useMemo</span>(
+    () => ({ user, setUser }),
+    [user]
+  );
+
+  <span class="kw">return</span> (
+    <span class="tag">&lt;AuthContext.Provider</span> <span class="attr">value</span>={value}<span class="tag">&gt;</span>
+      {children}
+    <span class="tag">&lt;/AuthContext.Provider&gt;</span>
+  );
+}` },
+          { type: 'quiz', question: 'Why is Context API not ideal for high-frequency state updates (like a real-time counter)?', options: ['Context doesn\'t support numbers as values', 'Every consumer of the context re-renders when the value changes — even if they only use part of it', 'Context is limited to 10 updates per second', 'You can\'t use useState inside a Context provider'], correct: 1, feedback: 'Context re-renders ALL consumers when its value changes — there\'s no selector mechanism. For something updating many times per second (live data, animations), this causes a performance waterfall. Use Zustand or Redux for fine-grained subscriptions.' }
+        ]
+      },
+      {
+        id: 'l4_1', title: 'Zustand — Modern Global State', type: 'code', xp: 100,
+        meta: '10 min · Code + Challenge',
+        blocks: [
+          { type: 'text', content: 'Zustand is the modern default for global state. <strong>Minimal boilerplate, surgical re-renders</strong>. Many startups and mid-sized companies have moved from Redux to Zustand.' },
+          { type: 'code', label: 'Zustand store — less than 15 lines', code: `<span class="kw">import</span> { <span class="fn">create</span> } <span class="kw">from</span> <span class="str">'zustand'</span>;
+
+<span class="kw">const</span> <span class="var">useStore</span> = <span class="fn">create</span>((<span class="var">set</span>) => ({
+  <span class="attr">bears</span>: <span class="num">0</span>,
+  <span class="attr">cart</span>: [],
+
+  <span class="attr">addBear</span>: () => <span class="fn">set</span>(<span class="var">state</span> => ({
+    <span class="attr">bears</span>: state.<span class="attr">bears</span> + <span class="num">1</span>
+  })),
+
+  <span class="attr">addToCart</span>: (<span class="var">item</span>) => <span class="fn">set</span>(<span class="var">state</span> => ({
+    <span class="attr">cart</span>: [...state.<span class="attr">cart</span>, item]
+  })),
+}));
+
+<span class="cmt">// In a component — only re-renders when bears changes:</span>
+<span class="kw">const</span> <span class="var">bears</span> = <span class="var">useStore</span>(<span class="var">state</span> => state.<span class="attr">bears</span>);` },
+          { type: 'quiz', question: 'What\'s the key advantage of Zustand\'s selector pattern over Context?', options: ['Zustand works without React', 'Components only re-render when the specific slice of state they subscribe to changes — not the whole store', 'Zustand is faster than useState', 'Zustand stores work in Node.js too'], correct: 1, feedback: 'Selectors enable surgical subscriptions. A component using `state => state.bears` only re-renders when `bears` changes — even if `cart` updates 100 times. Context has no equivalent — all consumers re-render on any change.' }
+        ]
+      },
+      {
+        id: 'l4_2', title: 'Redux Toolkit — The Interview Standard', type: 'code', xp: 125,
+        meta: '12 min · Code + Challenge',
+        blocks: [
+          { type: 'text', content: 'Redux is still the most asked-about state management in interviews for larger companies. <strong>Redux Toolkit (RTK) is the modern way</strong> — no one writes legacy Redux boilerplate anymore.' },
+          { type: 'flashcards', cards: [
+            { q: 'What problem does Redux solve?', a: 'Predictable state container with a single source of truth. Time-travel debugging, middleware (thunks), and structured patterns for large teams.' },
+            { q: 'What is a "slice" in Redux Toolkit?', a: 'A bundle of: initial state + reducer functions + auto-generated action creators. Created with createSlice(). Replaces the old reducer + constants + action creators pattern.' },
+            { q: 'What is createAsyncThunk?', a: 'RTK utility for async operations (API calls). Automatically dispatches pending/fulfilled/rejected actions. Replaces hand-written thunks.' },
+            { q: 'Redux vs Zustand — when to use each?', a: 'Redux: large teams, complex async flows, devtools requirement, strict patterns. Zustand: smaller teams, simpler state, less boilerplate, modern stack.' },
+          ]},
+          { type: 'code', label: 'Redux Toolkit slice — modern pattern', code: `<span class="kw">import</span> { <span class="fn">createSlice</span>, <span class="fn">createAsyncThunk</span> } <span class="kw">from</span> <span class="str">'@reduxjs/toolkit'</span>;
+
+<span class="kw">export const</span> <span class="var">fetchUser</span> = <span class="fn">createAsyncThunk</span>(
+  <span class="str">'user/fetch'</span>,
+  <span class="kw">async</span> (<span class="var">userId</span>) => {
+    <span class="kw">const</span> <span class="var">res</span> = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">\`/api/users/\${userId}\`</span>);
+    <span class="kw">return</span> res.<span class="fn">json</span>();
+  }
+);
+
+<span class="kw">const</span> <span class="var">userSlice</span> = <span class="fn">createSlice</span>({
+  <span class="attr">name</span>: <span class="str">'user'</span>,
+  <span class="attr">initialState</span>: { <span class="attr">data</span>: <span class="kw">null</span>, <span class="attr">status</span>: <span class="str">'idle'</span> },
+  <span class="attr">reducers</span>: {
+    <span class="fn">clearUser</span>: (<span class="var">state</span>) => { state.<span class="attr">data</span> = <span class="kw">null</span>; }
+  },
+  <span class="attr">extraReducers</span>: (<span class="var">builder</span>) => {
+    builder
+      .<span class="fn">addCase</span>(fetchUser.<span class="attr">pending</span>, (<span class="var">state</span>) => {
+        state.<span class="attr">status</span> = <span class="str">'loading'</span>;
+      })
+      .<span class="fn">addCase</span>(fetchUser.<span class="attr">fulfilled</span>, (<span class="var">state</span>, <span class="var">action</span>) => {
+        state.<span class="attr">data</span> = action.<span class="attr">payload</span>;
+        state.<span class="attr">status</span> = <span class="str">'success'</span>;
+      });
+  }
+});` }
+        ]
+      }
+    ]
+  },
+  {
+    id: 5, icon: '🔷', title: 'Module 5: React + TypeScript',
+    sub: 'Props typing · Hooks · Generics · Events',
+    lessons: [
+      {
+        id: 'l5_0', title: 'Typing Props & Components', type: 'code', xp: 75,
+        meta: '10 min · Code + Quiz',
+        blocks: [
+          { type: 'text', content: 'TypeScript in React is about <strong>catching errors at compile time</strong>, not at 2am in production. Most companies hiring mid-to-senior devs expect TypeScript fluency.' },
+          { type: 'code', label: 'Props interface patterns', code: `<span class="cmt">// Define an interface for props</span>
+<span class="kw">interface</span> <span class="var">ButtonProps</span> {
+  <span class="attr">label</span>: <span class="kw">string</span>;
+  <span class="attr">onClick</span>: () => <span class="kw">void</span>;
+  <span class="attr">variant</span>?: <span class="str">'primary'</span> | <span class="str">'secondary'</span>; <span class="cmt">// optional union type</span>
+  <span class="attr">disabled</span>?: <span class="kw">boolean</span>;
+}
+
+<span class="kw">function</span> <span class="fn">Button</span>({ label, onClick, variant = <span class="str">'primary'</span>, disabled }: <span class="var">ButtonProps</span>) {
+  <span class="kw">return</span> (
+    <span class="tag">&lt;button</span>
+      <span class="attr">onClick</span>={onClick}
+      <span class="attr">disabled</span>={disabled}
+      <span class="attr">className</span>={variant}
+    <span class="tag">&gt;</span>
+      {label}
+    <span class="tag">&lt;/button&gt;</span>
+  );
+}` },
+          { type: 'flashcards', cards: [
+            { q: 'How do you type useState with TypeScript?', a: 'const [user, setUser] = useState<User | null>(null) — the generic tells TS what type the state holds. Without it, TS infers from initial value.' },
+            { q: 'How do you type a click event handler?', a: 'onClick: (e: React.MouseEvent<HTMLButtonElement>) => void — or more commonly just () => void if you don\'t need the event object.' },
+            { q: 'What\'s the difference between `type` and `interface` for props?', a: 'Both work for props. Interfaces are extendable (extends). Types are more flexible (union types, computed types). Most teams pick one and stay consistent.' },
+            { q: 'How do you type children in React?', a: 'children: React.ReactNode — this is the broadest type, accepting JSX, strings, numbers, arrays, null. Use React.FC sparingly (it has known tradeoffs).' },
+          ]}
+        ]
+      }
+    ]
+  },
+  {
+    id: 6, icon: '🧪', title: 'Module 6: Testing',
+    sub: 'Jest · React Testing Library · Test strategy',
+    lessons: [
+      {
+        id: 'l6_0', title: 'Testing Philosophy — What to Test', type: 'concept', xp: 75,
+        meta: '8 min · Concept + Flashcards',
+        blocks: [
+          { type: 'text', content: '"Test behavior, not implementation." This is the core principle of React Testing Library. <strong>Your tests should not care how your code works internally</strong> — only what it does for the user.' },
+          { type: 'flashcards', cards: [
+            { q: 'What is React Testing Library\'s core philosophy?', a: 'Test your component the way a user would interact with it — find elements by role/text, simulate user events, assert on visible output.' },
+            { q: 'What\'s wrong with testing implementation details?', a: 'If you test internal state or method names, refactoring breaks your tests even when behavior is unchanged. Fragile tests add noise, not confidence.' },
+            { q: 'What are the 3 levels of testing in React?', a: 'Unit (single component), Integration (component tree interaction), E2E (full user flow in browser — Cypress/Playwright). Most value comes from integration tests.' },
+            { q: 'What does `getByRole` test?', a: 'Finds elements by their ARIA role — button, heading, textbox, etc. This aligns tests with accessibility and is more resilient than querying by className or ID.' },
+          ]},
+          { type: 'code', label: 'A real RTL test — behavior-focused', code: `<span class="kw">import</span> { <span class="fn">render</span>, <span class="fn">screen</span>, <span class="fn">fireEvent</span> } <span class="kw">from</span> <span class="str">'@testing-library/react'</span>;
+
+<span class="fn">test</span>(<span class="str">'increments counter when button is clicked'</span>, () => {
+  <span class="fn">render</span>(<span class="tag">&lt;Counter /&gt;</span>);
+
+  <span class="kw">const</span> <span class="var">btn</span> = screen.<span class="fn">getByRole</span>(<span class="str">'button'</span>, { <span class="attr">name</span>: <span class="str">/add/i</span> });
+  <span class="kw">const</span> <span class="var">display</span> = screen.<span class="fn">getByText</span>(<span class="str">'0'</span>);
+
+  <span class="fn">fireEvent</span>.<span class="fn">click</span>(btn);
+
+  <span class="fn">expect</span>(screen.<span class="fn">getByText</span>(<span class="str">'1'</span>)).<span class="fn">toBeInTheDocument</span>();
+});` },
+          { type: 'challenge', prompt: 'Write a test for a LoginForm component that:\n1. Renders email + password inputs\n2. User fills them in\n3. Clicks "Log in"\n4. Asserts the onSubmit mock was called with the correct values\n\nDescribe each step or write the test.', readOnly: false, solution: `import { render, screen, fireEvent } from '@testing-library/react';
+
+test('calls onSubmit with email and password', () => {
+  const mockSubmit = jest.fn();
+  render(<LoginForm onSubmit={mockSubmit} />);
+
+  // Find inputs by their accessible role/label
+  fireEvent.change(screen.getByLabelText(/email/i), {
+    target: { value: 'yuri@test.com' }
+  });
+  fireEvent.change(screen.getByLabelText(/password/i), {
+    target: { value: 'secret123' }
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: /log in/i }));
+
+  expect(mockSubmit).toHaveBeenCalledWith({
+    email: 'yuri@test.com',
+    password: 'secret123'
+  });
+});
+
+Key RTL principles used:
+- getByLabelText — tests accessibility (label must be linked to input)
+- getByRole — finds button semantically
+- jest.fn() — spy on the callback prop` }
+        ]
+      }
+    ]
+  }
+];
+
+// ═══════════════════════════ STATE ═══════════════════════════
+
+const STORAGE_KEY = 'react_curriculum_v1';
+
+function loadProgress() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : { completed: {}, started: {} };
+  } catch { return { completed: {}, started: {} }; }
+}
+
+function saveProgress(p) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch {}
+}
+
+let progress = loadProgress();
+let currentModuleId = null;
+let currentLessonIndex = 0;
+let currentLessonList = [];
+let fcIndex = 0;
+let fcFlipped = false;
+
+// ═══════════════════════════ SCREENS ═══════════════════════════
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goHome() {
+  showScreen('home');
+  renderHome();
+}
+
+// ═══════════════════════════ HOME ═══════════════════════════
+
+function renderHome() {
+  const totalLessons = CURRICULUM.reduce((a,m) => a + m.lessons.length, 0);
+  const doneLessons = Object.keys(progress.completed).length;
+  const pct = Math.round((doneLessons / totalLessons) * 100);
+
+  document.getElementById('home-progress-text').textContent =
+    `${doneLessons} of ${totalLessons} lessons complete`;
+
+  const circle = document.getElementById('ring-circle');
+  const circumference = 163.4;
+  circle.style.strokeDashoffset = circumference - (pct / 100) * circumference;
+  document.getElementById('ring-pct').textContent = pct + '%';
+
+  const list = document.getElementById('modules-list');
+  list.innerHTML = '';
+
+  CURRICULUM.forEach((mod, i) => {
+    const lessons = mod.lessons;
+    const doneMod = lessons.filter(l => progress.completed[l.id]).length;
+    const isFirst = i === 0;
+    const prevDone = i === 0 || CURRICULUM[i-1].lessons.every(l => progress.completed[l.id]);
+    const locked = !isFirst && !prevDone;
+    const completed = lessons.every(l => progress.completed[l.id]);
+    const inProg = doneMod > 0 && !completed;
+
+    const card = document.createElement('div');
+    card.className = `module-card ${locked ? 'locked' : 'unlocked'} ${completed ? 'completed' : ''} ${inProg ? 'in-progress' : ''}`;
+    card.innerHTML = `
+      <div class="mod-icon">${mod.icon}</div>
+      <div class="mod-info">
+        <div class="mod-title">${mod.title}</div>
+        <div class="mod-meta">
+          <span>${lessons.length} lessons</span>
+          <span>${doneMod}/${lessons.length} done</span>
+        </div>
+      </div>
+      <div class="mod-status">${completed ? '✅' : locked ? '🔒' : inProg ? '▶️' : '○'}</div>
+    `;
+    if (!locked) card.onclick = () => openModule(mod.id);
+    list.appendChild(card);
+  });
+}
+
+// ═══════════════════════════ MODULE VIEW ═══════════════════════════
+
+function openModule(modId) {
+  currentModuleId = modId;
+  const mod = CURRICULUM[modId];
+  document.getElementById('mv-title').textContent = mod.title;
+  document.getElementById('mv-sub').textContent = mod.sub;
+
+  const totalDone = mod.lessons.filter(l => progress.completed[l.id]).length;
+  const pct = mod.lessons.length ? (totalDone / mod.lessons.length) * 100 : 0;
+  document.getElementById('mv-progress-bar').style.width = pct + '%';
+
+  const list = document.getElementById('lessons-list');
+  list.innerHTML = '';
+
+  const prevMod = modId > 0 ? CURRICULUM[modId - 1] : null;
+  const prevDone = !prevMod || prevMod.lessons.every(l => progress.completed[l.id]);
+
+  mod.lessons.forEach((lesson, i) => {
+    const done = !!progress.completed[lesson.id];
+    const firstLocked = modId > 0 && !prevDone;
+    const locked = firstLocked || (i > 0 && !progress.completed[mod.lessons[i-1].id] && !done);
+    const isNext = !done && !locked && (i === 0 || progress.completed[mod.lessons[i-1].id]);
+
+    const badgeMap = { quiz: 'quiz', code: 'code', project: 'project', flash: 'flash', concept: 'flash' };
+    const labelMap = { quiz: 'quiz', code: 'code', project: 'project', flash: 'cards', concept: 'concept' };
+
+    const item = document.createElement('div');
+    item.className = `lesson-item ${done ? 'done' : ''} ${locked ? 'locked' : ''}`;
+    item.innerHTML = `
+      <div class="lesson-dot ${done ? 'done' : isNext ? 'active' : ''}">
+        ${done ? '✓' : String(i + 1).padStart(2,'0')}
+      </div>
+      <div class="lesson-info">
+        <h3>${lesson.title}</h3>
+        <p>${lesson.meta}</p>
+      </div>
+      <span class="lesson-type-badge ${badgeMap[lesson.type]||''}">${labelMap[lesson.type]||lesson.type}</span>
+    `;
+    if (!locked) item.onclick = () => openLesson(modId, i);
+    list.appendChild(item);
+  });
+
+  showScreen('module-view');
+}
+
+// ═══════════════════════════ LESSON VIEW ═══════════════════════════
+
+function openLesson(modId, lessonIdx) {
+  currentModuleId = modId;
+  currentLessonIndex = lessonIdx;
+  currentLessonList = CURRICULUM[modId].lessons;
+
+  const lesson = currentLessonList[lessonIdx];
+  document.getElementById('lv-title').textContent = lesson.title;
+  document.getElementById('lv-meta').textContent = lesson.meta;
+  document.getElementById('lv-xp').textContent = `+${lesson.xp} XP`;
+
+  document.getElementById('lesson-back-btn').onclick = () => openModule(modId);
+
+  const prevBtn = document.getElementById('lesson-prev-btn');
+  const nextBtn = document.getElementById('lesson-next-btn');
+  prevBtn.style.display = lessonIdx === 0 ? 'none' : '';
+  nextBtn.textContent = lessonIdx === currentLessonList.length - 1 ? 'Complete ✓' : 'Next →';
+
+  renderLessonContent(lesson);
+  showScreen('lesson-view');
+}
+
+function lessonNav(dir) {
+  const lesson = currentLessonList[currentLessonIndex];
+  if (dir === 1) {
+    // Mark complete
+    if (!progress.completed[lesson.id]) {
+      progress.completed[lesson.id] = Date.now();
+      saveProgress(progress);
+      showToast();
+    }
+    if (currentLessonIndex < currentLessonList.length - 1) {
+      openLesson(currentModuleId, currentLessonIndex + 1);
+    } else {
+      openModule(currentModuleId);
+    }
+  } else {
+    if (currentLessonIndex > 0) {
+      openLesson(currentModuleId, currentLessonIndex - 1);
+    }
+  }
+}
+
+function showToast() {
+  const wrap = document.getElementById('toast-wrap');
+  wrap.style.display = 'flex';
+  setTimeout(() => { wrap.style.display = 'none'; }, 3200);
+}
+
+// ═══════════════════════════ CONTENT RENDERING ═══════════════════════════
+
+function renderLessonContent(lesson) {
+  const container = document.getElementById('lesson-content');
+  container.innerHTML = '';
+  fcIndex = 0;
+  fcFlipped = false;
+
+  lesson.blocks.forEach((block, bi) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'content-block';
+    wrap.style.animationDelay = (bi * 0.06) + 's';
+    wrap.innerHTML = renderBlock(block, bi);
+    container.appendChild(wrap);
+    attachBlockEvents(wrap, block, bi);
+  });
+}
+
+function renderBlock(block, bi) {
+  switch(block.type) {
+    case 'text': return `<div class="block-text">${block.content}</div>`;
+    case 'code': return renderCode(block);
+    case 'quiz': return renderQuiz(block, bi);
+    case 'flashcards': return renderFlashcards(block, bi);
+    case 'diagram': return renderDiagram(block);
+    case 'challenge': return renderChallenge(block, bi);
+    default: return '';
+  }
+}
+
+function renderCode(block) {
+  return `<div class="block-code">
+    <div class="code-header">
+      <div class="code-dots">
+        <div class="code-dot" style="background:#ff5f57"></div>
+        <div class="code-dot" style="background:#ffbd2e"></div>
+        <div class="code-dot" style="background:#28ca41"></div>
+      </div>
+      <span>${block.label || 'code'}</span>
+    </div>
+    <pre>${block.code}</pre>
+
+  </div>`;
+}
+
+function renderQuiz(block, bi) {
+const opts = block.options.map((o, i) => ` <button class="quiz-option" data-idx="${i}" data-bi="${bi}"> <span class="quiz-option-key">${String.fromCharCode(65+i)}</span> ${o} </button>`).join(’’);
+return `<div class="block-quiz">
+<div class="quiz-question">
+<div class="quiz-q-text">${block.question}</div>
+<div class="quiz-options">${opts}</div>
+</div>
+<div class="quiz-feedback" id="qf-${bi}"></div>
+
+  </div>`;
+}
+
+function renderFlashcards(block, bi) {
+const card = block.cards[0];
+return `<div class="block-quiz">
+<div class="diagram-title" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">
+Flashcards — tap to flip
+</div>
+<div class="flashcard-wrap">
+<div class="flashcard" id="fc-${bi}" onclick="flipCard('${bi}')">
+<div class="flashcard-face flashcard-front">
+<div class="flashcard-hint">Question</div>
+<div class="flashcard-text" id="fcq-${bi}">${card.q}</div>
+</div>
+<div class="flashcard-face flashcard-back">
+<div class="flashcard-hint">Answer</div>
+<div class="flashcard-answer" id="fca-${bi}">${card.a}</div>
+</div>
+</div>
+</div>
+<div class="flashcard-nav">
+<button class="fc-btn" onclick="navCard('${bi}',-1,'${block.cards.map(c=>c.q+'|||'+c.a).join('~~~')}')">←</button>
+<span class="fc-count" id="fcc-${bi}">1 / ${block.cards.length}</span>
+<button class="fc-btn" onclick="navCard('${bi}',1,'${block.cards.map(c=>c.q+'|||'+c.a).join('~~~')}')">→</button>
+</div>
+
+  </div>`;
+}
+
+function renderDiagram(block) {
+const diagrams = {
+‘jsx-compile’: ` <div class="flow-diagram"> <div class="flow-node accent">📝 Your JSX</div> <div class="flow-arrow">↓</div> <div class="flow-label">Babel transforms</div> <div class="flow-node purple">React.createElement()</div> <div class="flow-arrow">↓</div> <div class="flow-label">React builds</div> <div class="flow-node accent">Virtual DOM Tree</div> <div class="flow-arrow">↓</div> <div class="flow-label">React commits</div> <div class="flow-node green">Real DOM</div> </div>`,
+‘render-cycle’: ` <div class="flow-diagram"> <div class="flow-node accent">State / Props Change</div> <div class="flow-arrow">↓</div> <div class="flow-node purple">🖥 Render Phase<br/><span style="font-size:10px;font-weight:400">Component fn runs → JSX returned</span></div> <div class="flow-arrow">↓</div> <div class="flow-node" style="font-size:11px">Reconciliation (diffing vDOM)</div> <div class="flow-arrow">↓</div> <div class="flow-node green">🔧 Commit Phase<br/><span style="font-size:10px;font-weight:400">Minimal real DOM updates</span></div> <div class="flow-arrow">↓</div> <div class="flow-node accent">useEffect runs</div> </div>`,
+‘use-effect’: ` <div class="flow-diagram"> <div class="flow-node green">Component Mounts</div> <div class="flow-arrow">↓</div> <div class="flow-node accent">useEffect runs</div> <div class="flow-arrow">↓</div> <div class="flow-node purple">Deps change → cleanup runs</div> <div class="flow-arrow">↓</div> <div class="flow-node accent">useEffect runs again</div> <div class="flow-arrow">↓</div> <div class="flow-node red">Component Unmounts → final cleanup</div> </div>`,
+‘router’: ` <div class="flow-diagram"> <div class="flow-node accent">User clicks Link</div> <div class="flow-arrow">↓</div> <div class="flow-label">No page reload</div> <div class="flow-node purple">History API pushes new URL</div> <div class="flow-arrow">↓</div> <div class="flow-node" style="font-size:11px">React Router matches path</div> <div class="flow-arrow">↓</div> <div class="flow-node green">New component renders</div> </div>`
+};
+return `<div class="block-diagram">
+<div class="diagram-title">${block.variant.replace(/-/g,’ ’)}</div>
+${diagrams[block.variant] || ‘<p>Diagram</p>’}
+
+  </div>`;
+}
+
+function renderChallenge(block, bi) {
+const promptFormatted = block.prompt.replace(/\n/g, ‘<br/>’);
+const inputPart = block.readOnly ? ‘’ : ` <textarea class="challenge-textarea" id="ct-${bi}" placeholder="Type your answer here..."></textarea>`;
+return `<div class="block-challenge">
+<div class="challenge-prompt">
+<div class="challenge-label">Code Challenge</div>
+<div class="challenge-text">${promptFormatted}</div>
+</div>
+${inputPart}
+<button class="challenge-reveal-btn" onclick="revealSolution('${bi}')">Reveal Solution</button>
+<div class="challenge-solution" id="cs-${bi}">
+<div class="block-code">
+<div class="code-header">
+<div class="code-dots">
+<div class="code-dot" style="background:#ff5f57"></div>
+<div class="code-dot" style="background:#ffbd2e"></div>
+<div class="code-dot" style="background:#28ca41"></div>
+</div>
+<span>solution</span>
+</div>
+<pre style="white-space:pre-wrap">${escapeHtml(block.solution)}</pre>
+</div>
+</div>
+
+  </div>`;
+}
+
+function escapeHtml(str) {
+return str.replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’);
+}
+
+// ═══════════════════════════ INTERACTIONS ═══════════════════════════
+
+function attachBlockEvents(wrap, block, bi) {
+if (block.type === ‘quiz’) {
+wrap.querySelectorAll(’.quiz-option’).forEach(btn => {
+btn.addEventListener(‘click’, () => {
+if (wrap.querySelector(’.quiz-option.correct’)) return; // already answered
+const idx = parseInt(btn.dataset.idx);
+const isCorrect = idx === block.correct;
+btn.classList.add(isCorrect ? ‘correct’ : ‘wrong’);
+if (!isCorrect) {
+wrap.querySelectorAll(’.quiz-option’)[block.correct].classList.add(‘correct’);
+}
+const fb = document.getElementById(`qf-${bi}`);
+fb.textContent = block.feedback;
+fb.className = `quiz-feedback show ${isCorrect ? 'correct' : 'wrong'}`;
+});
+});
+}
+}
+
+function flipCard(bi) {
+const card = document.getElementById(`fc-${bi}`);
+fcFlipped = !fcFlipped;
+card.classList.toggle(‘flipped’, fcFlipped);
+}
+
+const fcState = {};
+
+function navCard(bi, dir, encoded) {
+const cards = encoded.split(’~~~’).map(c => { const p = c.split(’|||’); return {q:p[0],a:p[1]}; });
+if (!fcState[bi]) fcState[bi] = 0;
+fcState[bi] = Math.max(0, Math.min(cards.length - 1, fcState[bi] + dir));
+const card = cards[fcState[bi]];
+document.getElementById(`fcq-${bi}`).textContent = card.q;
+document.getElementById(`fca-${bi}`).textContent = card.a;
+document.getElementById(`fcc-${bi}`).textContent = `${fcState[bi]+1} / ${cards.length}`;
+// reset flip
+const fc = document.getElementById(`fc-${bi}`);
+fc.classList.remove(‘flipped’);
+fcFlipped = false;
+}
+
+function revealSolution(bi) {
+const sol = document.getElementById(`cs-${bi}`);
+sol.classList.toggle(‘show’);
+}
+
+// ═══════════════════════════ INIT ═══════════════════════════
+
+renderHome();
+showScreen(‘home’);
+</script>
+
+</body>
+</html>
